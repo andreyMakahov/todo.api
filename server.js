@@ -7,7 +7,7 @@ var express 	= require('express'),
 
 var dbUrl = 'mongodb://localhost:27017/todo';
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ type: 'application/json' }))
 
 app.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -37,7 +37,7 @@ app.get('/todo/:id', function(req, res){
 	MongoClient.connect(dbUrl, function(err, db) {
 		if(err) throw new Error('No connection to db');
 		var collection = db.collection('todo'),
-			query = { 'index': parseInt(req.params.id) };
+			query = { 'position': parseInt(req.params.id) };
 		collection.findOne(query, function(err, doc) {
 			if(err) throw new Error('Error finding');
 			if(doc == null){
@@ -57,7 +57,7 @@ app.delete('/todo/:id', function(req, res){
 	MongoClient.connect(dbUrl, function(err, db) {
 		if(err) throw new Error('No connection to db');
 		var collection = db.collection('todo'),
-			query = { 'index': parseInt(req.params.id) };
+			query = { 'position': parseInt(req.params.id) };
 		collection.remove(query, function(err, removed) {
 			if(err) throw new Error('Error deleting');
 			res.json(removed);
@@ -74,11 +74,11 @@ app.post('/todo', function(req, res){
 		if(err) throw new Error('No connection to db');
 		var collection 	= db.collection('todo'),
 			item 		= {};
-		item.index 	= parseInt(req.body.index, 10);
-		item.title 	= req.body.title;
+		item.position 	= parseInt(req.body.position, 10);
+		item.title 		= req.body.title;
 		collection.insert(item, function(err, saved) {
 			if(err) throw new Error('Error creating');
-			res.json(saved);
+			res.json(saved[0]);
 			db.close();
 		});      
 	});
@@ -91,7 +91,7 @@ app.post('/todo/:id', function(req, res){
 		if(err) throw new Error('No connection to db');
 		var collection 	= db.collection('todo'),
 			item 		= {};
-		item.index 	= parseInt(req.body.index, 10);
+		item.position 	= parseInt(req.body.position, 10);
 		item.title 	= req.body.title;
 		collection.insert(item, function(err, saved) {
 			if(err) throw new Error('Error creating');
